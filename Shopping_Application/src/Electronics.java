@@ -21,14 +21,14 @@ import javax.swing.JOptionPane;
  *
  * @author Void
  */
-public class ElectronicsDB {
+public class Electronics {
     public static boolean flag = false;
     public static void insertIntoElectronicsDB(String brand, String model, int price, int qty, String description, String imagePath){
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/electronicsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
          
-            PreparedStatement ps = con.prepareStatement("INSERT INTO electronics(mbrand, mmodel, mprice,"
-                    + "mquantity, mdescription, mphoto) VALUES(?,?,?,?,?,?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO electronics(brand, model, price,"
+                    + "quantity, description, photo) VALUES(?,?,?,?,?,?)");
             
             ps.setString(1, brand);
             ps.setString(2, model);
@@ -40,16 +40,16 @@ public class ElectronicsDB {
                 JOptionPane.showMessageDialog(null, "Entry successful!");
             
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
     }
     
     }
     
     public static void updateElectronicsDB(String model, int qty){
          try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/electronicsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             
-            PreparedStatement ps = con.prepareStatement("UPDATE electronics SET mquantity=? WHERE mmodel=?");
+            PreparedStatement ps = con.prepareStatement("UPDATE electronics SET quantity=? WHERE model=?");
             
             ps.setInt(1, qty);
             ps.setString(2, model);
@@ -61,7 +61,7 @@ public class ElectronicsDB {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
 
     }
     }
@@ -69,23 +69,23 @@ public class ElectronicsDB {
     public static ArrayList<ProductList> TableGenerator(){
         ArrayList<ProductList> list = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/electronicsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             Statement ps = con.createStatement();
-            ResultSet rs = ps.executeQuery("SELECT mbrand, mmodel, mprice,mquantity, mdescription, mphoto FROM electronics");
+            ResultSet rs = ps.executeQuery("SELECT brand, model, price,quantity, description, photo FROM electronics");
             
             ProductList pl;
             
             while(rs.next()){
-                pl = new ProductList(rs.getString("mbrand"),rs.getString("mmodel"),
-                        rs.getInt("mprice"),rs.getInt("mquantity"),rs.getString("mdescription"),
-                        rs.getString("mphoto"));
+                pl = new ProductList(rs.getString("brand"),rs.getString("model"),
+                        rs.getInt("price"),rs.getInt("quantity"),rs.getString("description"),
+                        rs.getString("photo"));
                 
                 list.add(pl);
 
             }
             
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
 }
@@ -93,53 +93,53 @@ public class ElectronicsDB {
    public static ArrayList<ProductList> homePageContent(){
         ArrayList<ProductList> list = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/electronicsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             Statement ps = con.createStatement();
-            ResultSet rs = ps.executeQuery("SELECT mbrand, mmodel, mprice,mquantity, mdescription, mphoto FROM electronics ORDER BY id DESC LIMIT 3");
+            ResultSet rs = ps.executeQuery("SELECT brand, model, price,quantity, description, photo FROM electronics ORDER BY id DESC LIMIT 3");
             
             ProductList pl;
             
             while(rs.next()){
-                pl = new ProductList(rs.getString("mbrand"),rs.getString("mmodel"),
-                        rs.getInt("mprice"),rs.getInt("mquantity"),rs.getString("mdescription"),
-                        rs.getString("mphoto"));
+                pl = new ProductList(rs.getString("brand"),rs.getString("model"),
+                        rs.getInt("price"),rs.getInt("quantity"),rs.getString("description"),
+                        rs.getString("photo"));
                 
                 list.add(pl);
 
             }
             
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
    }
    public static ArrayList<ProductList> checkStock(){
         ArrayList<ProductList> list = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/electronicsDB.db");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             Statement ps = con.createStatement();
-            ResultSet rs = ps.executeQuery("SELECT mbrand, mmodel, mprice, mquantity FROM electronics");
+            ResultSet rs = ps.executeQuery("SELECT brand, model, price, quantity FROM electronics");
             
             ProductList pl;
             
             while(rs.next()){
-                pl = new ProductList(rs.getString("mbrand"),rs.getString("mmodel"),
-                        0, rs.getInt("mquantity"),null, null);
+                pl = new ProductList(rs.getString("brand"),rs.getString("model"),
+                        0, rs.getInt("quantity"),null, null);
                 
                 list.add(pl);
 
             }
             
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
    }
     
    public static void delete(String model){
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/electronicsDB.db");
-            PreparedStatement ps = con.prepareStatement("DELETE FROM electronics WHERE mmodel=?");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
+            PreparedStatement ps = con.prepareStatement("DELETE FROM electronics WHERE model=?");
             ps.setString(1, model);
             if(ps.executeUpdate()==0)
                 JOptionPane.showMessageDialog(null, "Entry does not exist!");
@@ -147,7 +147,7 @@ public class ElectronicsDB {
                 JOptionPane.showMessageDialog(null, "Entry deleted successfully!");
             
         } catch (SQLException ex) {
-            Logger.getLogger(ElectronicsDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Electronics.class.getName()).log(Level.SEVERE, null, ex);
         }
             
    }

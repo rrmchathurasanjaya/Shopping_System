@@ -20,14 +20,14 @@ import javax.swing.JOptionPane;
  *
  * @author Void
  */
-public class KidsDB {
+public class Mobiles {
     public static boolean flag = false;
-    public static void insertIntoKidsDB(String brand, String model, int price, int qty, String description, String imagePath){
+    public static void insertIntoMobileDB(String brand, String model, int price, int qty, String description, String imagePath){
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/kidsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
          
-            PreparedStatement ps = con.prepareStatement("INSERT INTO kids(mbrand, mmodel, mprice,"
-                    + "mquantity, mdescription, mphoto) VALUES(?,?,?,?,?,?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO mobile(brand, model, price,"
+                    + "quantity, description, photo) VALUES(?,?,?,?,?,?)");
             
             ps.setString(1, brand);
             ps.setString(2, model);
@@ -35,25 +35,23 @@ public class KidsDB {
             ps.setInt(4, qty);
             ps.setString(5, description);
             ps.setString(6, imagePath);
-            
             if(ps.executeUpdate()==1)
                 JOptionPane.showMessageDialog(null, "Entry successful!");
             
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
     }
     
     }
     
-    public static void updateKidsDB(String model, int qty){
+    public static void updateMobileDB(String model, int qty){
          try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/kidsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             
-            PreparedStatement ps = con.prepareStatement("UPDATE kids SET mquantity=? WHERE mmodel=?");
+            PreparedStatement ps = con.prepareStatement("UPDATE mobiles SET quantity=? WHERE model=?");
             
             ps.setInt(1, qty);
             ps.setString(2, model);
-            
             if(ps.executeUpdate()==0)
                 JOptionPane.showMessageDialog(null, "Entry does not exist!");
             else if(ps.executeUpdate()==1 && flag){
@@ -62,7 +60,7 @@ public class KidsDB {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(KidsDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
 
     }
     }
@@ -70,47 +68,46 @@ public class KidsDB {
     public static ArrayList<ProductList> TableGenerator(){
         ArrayList<ProductList> list = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/kidsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             Statement ps = con.createStatement();
-            ResultSet rs = ps.executeQuery("SELECT mbrand, mmodel, mprice,mquantity, mdescription, mphoto FROM kids");
+            ResultSet rs = ps.executeQuery("SELECT brand, model, price,quantity, description, photo FROM mobile");
             
             ProductList pl;
             
             while(rs.next()){
-                pl = new ProductList(rs.getString("mbrand"),rs.getString("mmodel"),
-                        rs.getInt("mprice"),rs.getInt("mquantity"),rs.getString("mdescription"),
-                        rs.getString("mphoto"));
+                pl = new ProductList(rs.getString("brand"),rs.getString("model"),
+                        rs.getInt("price"),rs.getInt("quantity"),rs.getString("description"),
+                        rs.getString("photo"));
                 
                 list.add(pl);
 
             }
-            
-            con.close();
+
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
 }
     public static ArrayList<ProductList> homePageContent(){
         ArrayList<ProductList> list = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/kidsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             Statement ps = con.createStatement();
-            ResultSet rs = ps.executeQuery("SELECT mbrand, mmodel, mprice,mquantity, mdescription, mphoto FROM kids ORDER BY id DESC LIMIT 3");
+            ResultSet rs = ps.executeQuery("SELECT brand, model, price,quantity, description, photo FROM mobile ORDER BY id DESC LIMIT 3");
             
             ProductList pl;
             
             while(rs.next()){
-                pl = new ProductList(rs.getString("mbrand"),rs.getString("mmodel"),
-                        rs.getInt("mprice"),rs.getInt("mquantity"),rs.getString("mdescription"),
-                        rs.getString("mphoto"));
+                pl = new ProductList(rs.getString("brand"),rs.getString("model"),
+                        rs.getInt("price"),rs.getInt("quantity"),rs.getString("description"),
+                        rs.getString("photo"));
                 
                 list.add(pl);
 
             }
             
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
    }
@@ -118,38 +115,38 @@ public class KidsDB {
     public static ArrayList<ProductList> checkStock(){
         ArrayList<ProductList> list = new ArrayList<>();
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/kidsDB.db");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
             Statement ps = con.createStatement();
-            ResultSet rs = ps.executeQuery("SELECT mbrand, mmodel, mprice, mquantity FROM kids");
+            ResultSet rs = ps.executeQuery("SELECT brand, model, price, quantity FROM mobile");
             
             ProductList pl;
             
             while(rs.next()){
-                pl = new ProductList(rs.getString("mbrand"),rs.getString("mmodel"),
-                        0, rs.getInt("mquantity"),null, null);
+                pl = new ProductList(rs.getString("brand"),rs.getString("model"),
+                        0, rs.getInt("quantity"),null, null);
                 
                 list.add(pl);
 
             }
             
         } catch (SQLException ex) {
-            Logger.getLogger(MobileDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Mobiles.class.getName()).log(Level.SEVERE, null, ex);
         }
         return list;
    }
     
        public static void delete(String model){
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:DBs/kidsDB.db");
-            PreparedStatement ps = con.prepareStatement("DELETE FROM kids WHERE mmodel=?");
+             Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/shopping_application","root","");
+            PreparedStatement ps = con.prepareStatement("DELETE FROM mobile WHERE model=?");
             ps.setString(1, model);
-            if(ps.executeUpdate()==0)
+           if(ps.executeUpdate()==0)
                 JOptionPane.showMessageDialog(null, "Entry does not exist!");
             else
                 JOptionPane.showMessageDialog(null, "Entry deleted successfully!");
             
         } catch (SQLException ex) {
-            Logger.getLogger(ElectronicsDB.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Electronics.class.getName()).log(Level.SEVERE, null, ex);
         }
             
    }

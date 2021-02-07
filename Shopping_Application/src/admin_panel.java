@@ -1,13 +1,20 @@
 
 import java.awt.Image;
 import java.io.File;
+import java.awt.Color;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -20,13 +27,19 @@ import javax.swing.JOptionPane;
  * @author Chathura Sanjaya
  */
 public class admin_panel extends javax.swing.JFrame {
-  boolean imageChooser = false;
-    String path;
+ 
+    Connection con = null;
+    ResultSet rs = null;
+    PreparedStatement ps = null;
+    private ImageIcon finalImage;
+    private String filename;
+     String path;
     /**
      * Creates new form admin_panel
      */
     public admin_panel() {
         initComponents();
+         con = Dbconnection.getConnection();
     }
 
     /**
@@ -41,18 +54,18 @@ public class admin_panel extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        mBrand = new javax.swing.JTextField();
-        mModel = new javax.swing.JTextField();
+        Brand = new javax.swing.JTextField();
+        Model = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        mPrice = new javax.swing.JTextField();
-        mQty = new javax.swing.JTextField();
+        Price = new javax.swing.JTextField();
+        Qty = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        mCat = new javax.swing.JComboBox<>();
+        Cat = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        mDescription = new javax.swing.JTextArea();
+        Description = new javax.swing.JTextArea();
         selectedPhoto = new javax.swing.JLabel();
         mPhotoPath = new javax.swing.JTextField();
         photoSelection = new javax.swing.JButton();
@@ -68,32 +81,32 @@ public class admin_panel extends javax.swing.JFrame {
         jLabel3.setForeground(new java.awt.Color(0, 77, 64));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Product Details");
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 24, 150, -1));
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 150, -1));
 
         jLabel4.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 77, 64));
         jLabel4.setText("Brand:");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, 104, -1));
 
-        mBrand.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        mBrand.setForeground(new java.awt.Color(0, 77, 64));
-        mBrand.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
-        mBrand.addActionListener(new java.awt.event.ActionListener() {
+        Brand.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Brand.setForeground(new java.awt.Color(0, 77, 64));
+        Brand.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
+        Brand.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mBrandActionPerformed(evt);
+                BrandActionPerformed(evt);
             }
         });
-        jPanel1.add(mBrand, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 110, 362, -1));
+        jPanel1.add(Brand, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 110, 362, -1));
 
-        mModel.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        mModel.setForeground(new java.awt.Color(0, 77, 64));
-        mModel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
-        mModel.addActionListener(new java.awt.event.ActionListener() {
+        Model.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Model.setForeground(new java.awt.Color(0, 77, 64));
+        Model.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
+        Model.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mModelActionPerformed(evt);
+                ModelActionPerformed(evt);
             }
         });
-        jPanel1.add(mModel, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 150, 362, -1));
+        jPanel1.add(Model, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 150, 362, -1));
 
         jLabel5.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(0, 77, 64));
@@ -105,25 +118,25 @@ public class admin_panel extends javax.swing.JFrame {
         jLabel7.setText("Price:");
         jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 190, 104, -1));
 
-        mPrice.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        mPrice.setForeground(new java.awt.Color(0, 77, 64));
-        mPrice.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
-        mPrice.addActionListener(new java.awt.event.ActionListener() {
+        Price.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Price.setForeground(new java.awt.Color(0, 77, 64));
+        Price.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
+        Price.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mPriceActionPerformed(evt);
+                PriceActionPerformed(evt);
             }
         });
-        jPanel1.add(mPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 190, 180, -1));
+        jPanel1.add(Price, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 190, 180, -1));
 
-        mQty.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        mQty.setForeground(new java.awt.Color(0, 77, 64));
-        mQty.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
-        mQty.addActionListener(new java.awt.event.ActionListener() {
+        Qty.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Qty.setForeground(new java.awt.Color(0, 77, 64));
+        Qty.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 77, 64)));
+        Qty.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mQtyActionPerformed(evt);
+                QtyActionPerformed(evt);
             }
         });
-        jPanel1.add(mQty, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 230, 110, -1));
+        jPanel1.add(Qty, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 230, 110, -1));
 
         jLabel8.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(0, 77, 64));
@@ -135,21 +148,21 @@ public class admin_panel extends javax.swing.JFrame {
         jLabel6.setText("Category:");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 270, 104, -1));
 
-        mCat.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        mCat.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Electronics", "Mobile", "Kids" }));
-        jPanel1.add(mCat, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 270, -1, -1));
+        Cat.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Cat.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Electronics", "Mobile", "Kids" }));
+        jPanel1.add(Cat, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 270, -1, -1));
 
         jLabel9.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(0, 77, 64));
         jLabel9.setText("Product Description:");
         jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 310, 140, -1));
 
-        mDescription.setColumns(20);
-        mDescription.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        mDescription.setLineWrap(true);
-        mDescription.setRows(5);
-        mDescription.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 77, 64), 1, true));
-        jScrollPane1.setViewportView(mDescription);
+        Description.setColumns(20);
+        Description.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Description.setLineWrap(true);
+        Description.setRows(5);
+        Description.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 77, 64), 1, true));
+        jScrollPane1.setViewportView(Description);
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 320, 370, 190));
 
@@ -202,21 +215,21 @@ public class admin_panel extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void mBrandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mBrandActionPerformed
+    private void BrandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BrandActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_mBrandActionPerformed
+    }//GEN-LAST:event_BrandActionPerformed
 
-    private void mModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mModelActionPerformed
+    private void ModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModelActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_mModelActionPerformed
+    }//GEN-LAST:event_ModelActionPerformed
 
-    private void mPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPriceActionPerformed
+    private void PriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PriceActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_mPriceActionPerformed
+    }//GEN-LAST:event_PriceActionPerformed
 
-    private void mQtyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mQtyActionPerformed
+    private void QtyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_QtyActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_mQtyActionPerformed
+    }//GEN-LAST:event_QtyActionPerformed
 
     private void mPhotoPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mPhotoPathActionPerformed
         // TODO add your handling code here:
@@ -224,56 +237,101 @@ public class admin_panel extends javax.swing.JFrame {
 
     private void photoSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_photoSelectionActionPerformed
         // TODO add your handling code here:
-        JFileChooser fc = new JFileChooser();
+         JFileChooser fc = new JFileChooser();
         fc.showOpenDialog(this);
         File selectedImage = fc.getSelectedFile();
         path = selectedImage.getName();
-
+        
         try {
             Image img = ImageIO.read(selectedImage);
             mPhotoPath.setText(path);
             selectedPhoto.setIcon(new ImageIcon(img.getScaledInstance(selectedPhoto.getWidth(),
-                selectedPhoto.getHeight(), Image.SCALE_SMOOTH)));
-    } catch (IOException ex) {
-        Logger.getLogger(admin_panel.class.getName()).log(Level.SEVERE, null, ex);
+                    selectedPhoto.getHeight(), Image.SCALE_SMOOTH)));
+        } catch (IOException ex) {
+            Logger.getLogger(admin_panel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_photoSelectionActionPerformed
 
     private void LogInButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LogInButtonActionPerformed
         // TODO add your handling code here:
+//          try {
+//            String sql = "insert into new_product"
+//                    +"(brand, model, price, quantity, category, product_description,"
+//                    + " img)values (?,?,?,?,?,?,?)";
+//            ps = con.prepareStatement(sql);
+//            ps.setString(1, mBrand.getText());
+//            ps.setString(2, mModel.getText());
+//            ps.setString(3, mPrice.getText());
+//             ps.setString(4, mQty.getText());
+//               if(mCat.getSelectedItem().equals("Mobile")){
+//                if(!path.equals(""))
+//                Mobiles.insertIntoMobileDB(mBrand.getText(), mModel.getText(), Integer.parseInt(mPrice.getText()),
+//                    Integer.parseInt(mQty.getText()), mDescription.getText(), path);
+//            }
+//
+//            else if(mCat.getSelectedItem().equals("Electronics")){
+//                if(!path.equals(""))
+//                Electronics.insertIntoElectronicsDB(mBrand.getText(), mModel.getText(), Integer.parseInt(mPrice.getText()),
+//                    Integer.parseInt(mQty.getText()), mDescription.getText(), path);
+//            }
+//            else if(mCat.getSelectedItem().equals("Kids")){
+//                if(!path.equals(""))
+//                Kids.insertIntoKidsDB(mBrand.getText(), mModel.getText(), Integer.parseInt(mPrice.getText()),
+//                    Integer.parseInt(mQty.getText()), mDescription.getText(), path);
+//               }
+//            //ps.setString(5, (String) mCat.getSelectedItem());
+//             ps.setString(6, mDescription.getText());
+//           if(filename!=null){
+//            FileInputStream fis=new FileInputStream(filename);
+//            ps.setBinaryStream(7,fis,(int)filename.length());
+//            }
+//            ps.execute();
+//            JOptionPane.showMessageDialog(null, "New Product added Successfully");
+//             mBrand.setText(null);
+//             mModel.setText(null);
+//             mPrice.setText(null);
+//             mQty.setText(null);
+//             mCat.setSelectedIndex(0);
+//             selectedPhoto.setIcon(null);
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, e);
+//        
+//        }
         try{
-            if(mCat.getSelectedItem().equals("Mobile")){
+            if(Cat.getSelectedItem().equals("Mobile")){
                 if(!path.equals(""))
-                MobileDB.insertIntoMobileDB(mBrand.getText(), mModel.getText(), Integer.parseInt(mPrice.getText()),
-                    Integer.parseInt(mQty.getText()), mDescription.getText(), path);
+                Mobiles.insertIntoMobileDB(Brand.getText(), Model.getText(), Integer.parseInt(Price.getText()),
+                    Integer.parseInt(Qty.getText()), Description.getText(), path);
             }
 
-            else if(mCat.getSelectedItem().equals("Electronics")){
+            else if(Cat.getSelectedItem().equals("Electronics")){
                 if(!path.equals(""))
-                ElectronicsDB.insertIntoElectronicsDB(mBrand.getText(), mModel.getText(), Integer.parseInt(mPrice.getText()),
-                    Integer.parseInt(mQty.getText()), mDescription.getText(), path);
+                Electronics.insertIntoElectronicsDB(Brand.getText(), Model.getText(), Integer.parseInt(Price.getText()),
+                    Integer.parseInt(Qty.getText()), Description.getText(), path);
             }
-            else if(mCat.getSelectedItem().equals("Kids")){
+            else if(Cat.getSelectedItem().equals("Kids")){
                 if(!path.equals(""))
-                KidsDB.insertIntoKidsDB(mBrand.getText(), mModel.getText(), Integer.parseInt(mPrice.getText()),
-                    Integer.parseInt(mQty.getText()), mDescription.getText(), path);
+                Kids.insertIntoKidsDB(Brand.getText(), Model.getText(), Integer.parseInt(Price.getText()),
+                    Integer.parseInt(Qty.getText()), Description.getText(), path);
             }
 
-            mBrand.setText("");
-            mModel.setText("");
-            mQty.setText("");
-            mPrice.setText("");
-            mDescription.setText("");
+            Brand.setText("");
+            Model.setText("");
+            Qty.setText("");
+            Price.setText("");
+            Description.setText("");
             mPhotoPath.setText("");
+            selectedPhoto.setIcon(null);
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, e);
-            mBrand.setText("");
-            mModel.setText("");
-            mQty.setText("");
-            mPrice.setText("");
-            mDescription.setText("");
+            Brand.setText("");
+            Model.setText("");
+            Qty.setText("");
+            Price.setText("");
+            Description.setText("");
             mPhotoPath.setText("");
+            selectedPhoto.setIcon(null);
         }
 
     }//GEN-LAST:event_LogInButtonActionPerformed
@@ -314,7 +372,13 @@ public class admin_panel extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField Brand;
+    private javax.swing.JComboBox<String> Cat;
+    private javax.swing.JTextArea Description;
     private javax.swing.JButton LogInButton;
+    private javax.swing.JTextField Model;
+    private javax.swing.JTextField Price;
+    private javax.swing.JTextField Qty;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -324,13 +388,7 @@ public class admin_panel extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField mBrand;
-    private javax.swing.JComboBox<String> mCat;
-    private javax.swing.JTextArea mDescription;
-    private javax.swing.JTextField mModel;
     private javax.swing.JTextField mPhotoPath;
-    private javax.swing.JTextField mPrice;
-    private javax.swing.JTextField mQty;
     private javax.swing.JButton photoSelection;
     private javax.swing.JLabel selectedPhoto;
     // End of variables declaration//GEN-END:variables
